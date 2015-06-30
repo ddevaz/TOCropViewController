@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
 @property (nonatomic, strong) TOCropViewControllerTransitioning *transitionController;
 @property (nonatomic, strong) UIPopoverController *activityPopoverController;
 @property (nonatomic, assign) BOOL inTransition;
+@property (nonatomic, assign) CGSize aspectRatio;
 
 /* Button callback */
 - (void)cancelButtonTapped;
