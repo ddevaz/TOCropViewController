@@ -244,6 +244,39 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self matchForegroundToBackground];
 }
 
+- (void)resetLayoutExceptClamping
+{
+    CGSize imageSize = self.imageSize;
+    self.scrollView.contentSize = imageSize;
+    
+    CGRect bounds = self.contentBounds;
+    
+    //work out the max and min scale of the image
+    CGFloat scale = MIN(CGRectGetWidth(bounds)/imageSize.width, CGRectGetHeight(bounds)/imageSize.height);
+    CGSize scaledSize = (CGSize){floorf(imageSize.width * scale), floorf(imageSize.height * scale)};
+    
+    self.scrollView.minimumZoomScale = scale;
+    self.scrollView.maximumZoomScale = 15.0f;
+    //set the fully zoomed out state initially
+    self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
+    self.scrollView.contentSize = scaledSize;
+    
+    //Relayout the image in the scroll view
+    CGRect frame = CGRectZero;
+    frame.size = scaledSize;
+    frame.origin.x = bounds.origin.x + floorf((CGRectGetWidth(bounds) - frame.size.width) * 0.5f);
+    frame.origin.y = bounds.origin.y + floorf((CGRectGetHeight(bounds) - frame.size.height) * 0.5f);
+    
+    //save the current state for use with 90-degree rotations
+    self.cropBoxLastEditedSize = self.cropBoxFrame.size;
+    self.cropBoxLastEditedAngle = 0;
+    
+    //save the size for checking if we're in a resettable state
+    self.originalCropBoxSize = self.cropBoxFrame.size;
+    
+    [self matchForegroundToBackground];
+}
+
 - (void)prepareforRotation
 {
     self.rotationContentOffset = self.scrollView.contentOffset;
@@ -512,13 +545,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         self.backgroundImageView.frame = self.backgroundContainerView.frame;
         self.foregroundImageView.frame = self.backgroundContainerView.frame;
         
-        [self layoutInitialImage];
+        [self resetLayoutExceptClamping];
         [self checkForCanReset];
         return;
     }
     
     [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.7f options:0 animations:^{
-        [self layoutInitialImage];
+        [self resetLayoutExceptClamping];
         [self checkForCanReset];
     } completion:nil];
 }
