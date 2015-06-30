@@ -77,6 +77,21 @@ typedef NS_ENUM(NSInteger, TOCropViewControllerAspectRatio) {
     return self;
 }
 
+- (instancetype)initWithImage:(UIImage *)image aspectRatio:(CGSize)aspectRatio
+{
+    self = [super init];
+    if (self) {
+        self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        self.modalPresentationStyle = UIModalPresentationFullScreen;
+        
+        _transitionController = [[TOCropViewControllerTransitioning alloc] init];
+        _image = image;
+        _aspectRatio = aspectRatio;
+    }
+    
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
